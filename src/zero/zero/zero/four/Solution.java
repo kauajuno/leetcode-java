@@ -1,57 +1,59 @@
 package zero.zero.zero.four;
 
+// TODO: come back some day and find an appropriate approach to this because as of now I'm not able to
+
 class Solution {
     public double findMedianSortedArrays(int[] nums1, int[] nums2) {
-        if(nums1.length == 0 && nums2.length == 1) return nums2[0];
-        if(nums2.length == 0 && nums1.length == 1) return nums1[0];
-        int totalLen = (nums1.length + nums2.length);
-        int cont = 0, cont1 = 0, cont2 = 0;
-        int[] arr = new int[2];
-        while(cont < ((totalLen - 1) / 2)){
-            if(cont1 == nums1.length){
-                cont2++;
-            }
-            if(cont2 == nums2.length){
-                cont1++;
-            }
-            if(cont1 != nums1.length && cont2 != nums2.length) {
-                if (Math.min(nums1[cont1], nums2[cont2]) == nums1[cont1]) {
-                    cont1++;
-                } else {
-                    cont2++;
-                }
-            }
-            cont++;
+
+        if (nums1.length > nums2.length) {
+            return findMedianSortedArrays(nums2, nums1);
         }
 
-        for(int i = 0; i < 2; i++){
-            if(cont1 == nums1.length){
-                arr[i] = nums2[cont2];
-                cont2++;
-                continue;
-            }
-            if(cont2 == nums2.length){
-                arr[i] = nums1[cont1];
-                cont1++;
-                continue;
-            }
-            if (Math.min(nums1[cont1], nums2[cont2]) == nums1[cont1]) {
-                arr[i] = nums1[cont1];
-                cont1++;
+        if(nums1.length == 0){
+            if(nums2.length % 2 == 1) return nums2[nums2.length / 2];
+            return (double) (nums2[nums2.length / 2] + nums2[nums2.length / 2 - 1]) / 2;
+        }
+
+        int ldown = 0, rdown = nums1.length - 1, mdown, mup;
+        int totalLen = nums1.length + nums2.length;
+
+        while (true) {
+            mdown = ldown + (rdown - ldown) / 2;
+            mup = (totalLen / 2) - mdown - 1;
+
+            if (mdown == rdown) break;
+
+            if (nums2[mup] > nums1[mdown + 1]) {
+                ldown = mdown + 1;
+            } else if (nums1[mdown] > nums2[mup + 1]) {
+                rdown = mdown - 1;
             } else {
-                arr[i] = nums2[cont2];
-                cont2++;
+                break;
+            }
+
+        }
+
+        if (mdown == rdown) {
+            if (totalLen % 2 == 0) {
+                return (double) (nums2[mup] + nums2[mup - 1]) / 2;
+            } else {
+                return nums2[mup];
             }
         }
 
-        if(totalLen % 2 == 0) return (double) (arr[0] + arr[1]) / 2;
-        return arr[0];
+        if (totalLen % 2 == 0) {
+            return (double) (Math.max(nums1[mdown], nums2[mup]) + Math.min(nums1[mdown + 1], nums2[mup + 1])) / 2;
+        }
+
+        return Math.min(nums1[mdown + 1], nums2[mup + 1]);
+
+
     }
 }
 
-class Main{
+class Main {
     public static void main(String[] args) {
         Solution s = new Solution();
-        System.out.println(s.findMedianSortedArrays(new int[]{}, new int[]{2, 3}));
+        System.out.println(s.findMedianSortedArrays(new int[]{0}, new int[]{2, 3, 5, 6, 7}));
     }
 }
